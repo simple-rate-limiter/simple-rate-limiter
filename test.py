@@ -1,11 +1,7 @@
 from simple_rate_limiter.backends.in_memory import InMemoryBackend
 from simple_rate_limiter.rate_limiter import RateLimiter
 
-rl = RateLimiter(
-    max_tokens=3,
-    period=1,
-    backend=InMemoryBackend()
-)
+rl = RateLimiter(max_tokens=3, period=1, backend=InMemoryBackend())
 
 DATA = [8] * 10
 

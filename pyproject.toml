@@ -5,3 +5,46 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+lint.select = [
+  "F",  # Enable pyflakes.
+  "E",  # Enable pycodestyle.
+  "W",  # Enable pycodestyle warnings.
+  "I",  # Enable isort.
+  "N",  # Enable pep8-naming.
+  "UP",  # Enable pyupgrade.
+  "B",  # Enable flake8-bugbear.
+  "A",  # Enable flake8-builtins.
+  "C4",  # Enable flake8-comprehensions.
+  "EXE",  # Enable flake8-executable.
+  "ISC",  # Enable flake8-implicit-str-concat.
+  "ICN",  # Enable flake8-import-conventions.
+  "G",  # Enable flake8-logging-format.
+  "PIE",  # Enable flake8-pie.
+  "T20",  # Enable flake8-print.
+  "PT",  # Enable flake8-pytest-style.
+  "Q",  # Enable flake8-quotes.
+  "RSE",  # Enable flake8-raise.
+  "SLF",  # Enable flake8-self.
+  "SIM",  # Enable flake8-simplify.
+  "ARG",  # Enable flake8-unused-arguments.
+  "PTH",  # Enable flake8-use-pathlib.
+  "ERA",  # Enable eradicate.
+  "PGH",  # Enable pygrep-hooks.
+  "PL",  # Enable pylint.
+  "TRY",  # Enable tryceratops.
+  "RUF",  # Enable ruff-specific rules.
+  "FBT003",  # Force boolean keyword args.
+]
+
+[dependency-groups]
+dev = [
+    "freezegun>=1.5.1",
+    "pytest>=8.3.5",
+    "ruff>=0.9.9",
+]
