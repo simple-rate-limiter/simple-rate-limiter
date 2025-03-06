@@ -12,8 +12,7 @@ class Record:
 
     def calculate_current_rate(self, rate: Rate, now: dt.datetime) -> float:
         return (
-                self.prev_count * (
-                1 - (now - self.window_start).total_seconds() / rate.period.total_seconds()) + self.count
+            self.prev_count * (1 - (now - self.window_start).total_seconds() / rate.period.total_seconds()) + self.count
         )
 
     def sync(self, rate: Rate, now: dt.datetime) -> None:

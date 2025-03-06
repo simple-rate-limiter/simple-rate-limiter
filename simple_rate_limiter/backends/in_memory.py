@@ -8,7 +8,6 @@ from simple_rate_limiter.rate import Rate
 
 
 class InMemoryBackend(BaseBackend):
-
     def __init__(self):
         self._storage: dict[str, Record] = {}
         self._locks: dict[str, threading.Lock] = defaultdict(threading.Lock)

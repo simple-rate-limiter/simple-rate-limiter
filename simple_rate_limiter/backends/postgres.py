@@ -10,9 +10,9 @@ class Queries:
     CREATE_TABLE = """
     CREATE TABLE IF NOT EXISTS {table_name} (
         key TEXT PRIMARY KEY,
-        window_start TIMESTAMP NOT NULL,
+        window_start TIMESTAMPTZ NOT NULL,
         prev_count INT NOT NULL,
-        count INT NOT NULL,
+        count INT NOT NULL
     );
     """
 
@@ -87,5 +87,7 @@ class PostgresBackend(BaseBackend):
         return record
 
     def _insert_record(self, cur, key, record):
-        cur.execute(Queries.INSERT.format(table_name=self.table_name),
-                    (key, record.window_start, record.prev_count, record.count))
+        cur.execute(
+            Queries.INSERT.format(table_name=self.table_name),
+            (key, record.window_start, record.prev_count, record.count),
+        )
