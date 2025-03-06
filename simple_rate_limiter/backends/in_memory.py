@@ -15,7 +15,8 @@ class Record:
 
     def calculate_current_rate(self, rate: Rate, now: dt.datetime) -> float:
         return (
-            self.prev_count * (1 - (now - self.window_start).total_seconds() / rate.period.total_seconds()) + self.count
+                self.prev_count * (
+                    1 - (now - self.window_start).total_seconds() / rate.period.total_seconds()) + self.count
         )
 
     def sync(self, rate: Rate, now: dt.datetime) -> None:
@@ -33,13 +34,13 @@ class Record:
 
 class InMemoryBackend(BaseBackend):
     def __init__(self):
-        self.storage: dict[str, Record] = {}
+        self._storage: dict[str, Record] = {}
         self._locks: dict[str, threading.Lock] = defaultdict(threading.Lock)
 
     def try_acquire(self, rate: Rate, key: str, num_tokens: int) -> int:
         with self._locks[key]:
             now = dt.datetime.now(dt.UTC)
-            rec = self.storage.setdefault(key, Record(now, 0, 0))
+            rec = self._storage.setdefault(key, Record(now, 0, 0))
             rec.sync(rate, now)
             allowed = max(
                 min(rate.max_tokens - rec.calculate_current_rate(rate, now), num_tokens),
@@ -51,7 +52,7 @@ class InMemoryBackend(BaseBackend):
     def try_acquire_all(self, rate: Rate, key: str, num_tokens: int) -> bool:
         with self._locks[key]:
             now = dt.datetime.now(dt.UTC)
-            rec = self.storage.setdefault(key, Record(now, 0, 0))
+            rec = self._storage.setdefault(key, Record(now, 0, 0))
             rec.sync(rate, now)
             if rate.max_tokens - rec.calculate_current_rate(rate, now) - num_tokens < 0:
                 return False
