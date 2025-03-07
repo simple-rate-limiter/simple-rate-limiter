@@ -18,6 +18,7 @@ def postgres_conn():
     yield conn
     conn.close()
 
+
 @pytest.fixture
 def postgres_backend(postgres_conn):
     from simple_rate_limiter.backends.postgres import PostgresBackend
@@ -29,9 +30,11 @@ def postgres_backend(postgres_conn):
         cur.execute(f"DROP TABLE {table_name}")
         postgres_conn.commit()
 
+
 @pytest.fixture
 def in_memory_backend():
     return InMemoryBackend()
+
 
 @pytest.fixture(params=["postgres", "in_memory"])
 def backend(request, postgres_backend, in_memory_backend):

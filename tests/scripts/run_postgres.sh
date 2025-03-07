@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -a
+. .env
+set +a
+
 set -o pipefail
 
 # Function to start the PostgreSQL container

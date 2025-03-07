@@ -3,12 +3,15 @@ from simple_rate_limiter.rate import Rate
 
 
 class BaseBackend(ABC):
-    @abstractmethod
+
     def try_acquire(self, rate: Rate, key: str, num_tokens: int) -> int:
-        pass
+        return self._try_acquire(rate, key, num_tokens, require_all=False)
+
+    def try_acquire_all(self, rate: Rate, key: str, num_tokens: int) -> bool:
+        return self._try_acquire(rate, key, num_tokens, require_all=True)
 
     @abstractmethod
-    def try_acquire_all(self, rate: Rate, key: str, num_tokens: int) -> bool:
+    def _try_acquire(self, rate: Rate, key: str, num_tokens: int, require_all: bool) -> int | bool:
         pass
 
     @staticmethod
