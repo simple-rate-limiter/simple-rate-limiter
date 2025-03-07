@@ -1,4 +1,4 @@
-from simple_rate_limiter.backends._base import BaseBackend
+from simple_rate_limiter.backends.base import BaseBackend
 from simple_rate_limiter.rate import Rate
 
 

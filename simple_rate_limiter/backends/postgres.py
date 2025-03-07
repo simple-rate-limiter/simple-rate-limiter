@@ -1,7 +1,7 @@
 import datetime as dt
 import psycopg
 
-from simple_rate_limiter.backends._base import BaseBackend
+from simple_rate_limiter.backends.base import BaseBackend
 from simple_rate_limiter.backends.record import Record
 from simple_rate_limiter.rate import Rate
 
@@ -46,11 +46,6 @@ class PostgresBackend(BaseBackend):
         with self.conn.cursor() as cur:
             cur.execute(Queries.CREATE_TABLE.format(table_name=self.table_name))
 
-    def try_acquire(self, rate: Rate, key: str, num_tokens: int) -> int:
-        return self._try_acquire(rate, key, num_tokens, require_all=False)
-
-    def try_acquire_all(self, rate: Rate, key: str, num_tokens: int) -> bool:
-        return self._try_acquire(rate, key, num_tokens, require_all=True)
 
     def _try_acquire(self, rate: Rate, key: str, num_tokens: int, require_all: bool) -> int | bool:
         with self.conn.cursor() as cur:
