@@ -47,29 +47,27 @@ class PostgresBackend(BaseBackend):
             cur.execute(Queries.CREATE_TABLE.format(table_name=self.table_name))
 
     def try_acquire(self, rate: Rate, key: str, num_tokens: int) -> int:
+        return self._try_acquire(rate, key, num_tokens, require_all=False)
+
+    def try_acquire_all(self, rate: Rate, key: str, num_tokens: int) -> bool:
+        return self._try_acquire(rate, key, num_tokens, require_all=True)
+
+    def _try_acquire(self, rate: Rate, key: str, num_tokens: int, require_all: bool) -> int | bool:
         with self.conn.cursor() as cur:
             self._lock_key(cur, key)
             now = dt.datetime.now(dt.UTC)
             record = self._retrieve_record(cur, key, now, rate)
             allowed = self.get_allowed(now, num_tokens, rate, record)
+
+            if require_all and allowed != num_tokens:
+                return False
+
             record.count += allowed
             if allowed > 0:
                 self._insert_record(cur, key, record)
                 self.conn.commit()
-        return allowed
 
-    def try_acquire_all(self, rate: Rate, key: str, num_tokens: int) -> bool:
-        with self.conn.cursor() as cur:
-            self._lock_key(cur, key)
-            now = dt.datetime.now(dt.UTC)
-            record = self._retrieve_record(cur, key, now, rate)
-            allowed = self.get_allowed(now, num_tokens, rate, record)
-            if allowed != num_tokens:
-                return False
-            record.count += num_tokens
-            self._insert_record(cur, key, record)
-            self.conn.commit()
-        return True
+        return allowed if not require_all else True
 
     def _lock_key(self, cur, key):
         cur.execute(Queries.LOCK.format(table_name=self.table_name), (key,))

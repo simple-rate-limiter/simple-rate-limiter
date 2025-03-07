@@ -12,21 +12,24 @@ class InMemoryBackend(BaseBackend):
         self._storage: dict[str, Record] = {}
         self._locks: dict[str, threading.Lock] = defaultdict(threading.Lock)
 
-    def try_acquire(self, rate: Rate, key: str, num_tokens: int) -> int:
+    def _try_acquire(self, rate: Rate, key: str, num_tokens: int, require_all: bool) -> int | bool:
         with self._locks[key]:
             now = dt.datetime.now(dt.UTC)
             rec = self._storage.setdefault(key, Record(now, 0, 0))
+
+            if require_all:
+                rec.sync(rate, now)  # Only sync when requiring all tokens
+
             allowed = self.get_allowed(now, num_tokens, rate, rec)
+
+            if require_all and allowed != num_tokens:
+                return False  # Ensure all tokens can be acquired
+
             rec.count += allowed
-        return allowed
+        return allowed if not require_all else True
+
+    def try_acquire(self, rate: Rate, key: str, num_tokens: int) -> int:
+        return self._try_acquire(rate, key, num_tokens, require_all=False)
 
     def try_acquire_all(self, rate: Rate, key: str, num_tokens: int) -> bool:
-        with self._locks[key]:
-            now = dt.datetime.now(dt.UTC)
-            rec = self._storage.setdefault(key, Record(now, 0, 0))
-            rec.sync(rate, now)
-            allowed = self.get_allowed(now, num_tokens, rate, rec)
-            if allowed != num_tokens:
-                return False
-            rec.count += num_tokens
-        return True
+        return self._try_acquire(rate, key, num_tokens, require_all=True)
